@@ -18,6 +18,7 @@ using CluedIn.Core.Providers;
 using CluedIn.Crawling.Helpers;
 using CluedIn.ExternalSearch.Providers.Dawa.Vocabularies;
 using EntityType = CluedIn.Core.Data.EntityType;
+using CluedIn.Core.Messages.WebApp;
 
 namespace CluedIn.ExternalSearch.Providers.Dawa
 {
@@ -28,31 +29,11 @@ namespace CluedIn.ExternalSearch.Providers.Dawa
          * CONSTRUCTORS
          **********************************************************************************************************/
 
+        public static Guid DawaProviderId = Guid.Parse("886ebbe3-d9ee-401f-b8e8-93ee215f451e");
+
         public DawaExternalSearchProvider()
-            : this(true)
+            : base(DawaProviderId, EntityType.Organization)
         {
-            var nameBasedTokenProvider = new NameBasedTokenProvider("Dawa");
-
-            if (nameBasedTokenProvider.ApiToken != null)
-                this.TokenProvider = new RoundRobinTokenProvider(nameBasedTokenProvider.ApiToken.Split(',', ';'));
-        }
-
-        public DawaExternalSearchProvider(IList<string> tokens)
-            : this(true)
-        {
-            this.TokenProvider = new RoundRobinTokenProvider(tokens);
-        }
-
-        public DawaExternalSearchProvider([NotNull] IExternalSearchTokenProvider tokenProvider)
-            : this(true)
-        {
-            this.TokenProvider = tokenProvider ?? throw new ArgumentNullException(nameof(tokenProvider));
-        }
-
-        private DawaExternalSearchProvider(bool tokenProviderIsRequired)
-            : base(Constants.ExternalSearchProviders.PermId, EntityType.Organization)
-        {
-            this.TokenProviderIsRequired = tokenProviderIsRequired;
         }
 
         /**********************************************************************************************************
@@ -62,9 +43,8 @@ namespace CluedIn.ExternalSearch.Providers.Dawa
         /// <inheritdoc/>
         public override IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request)
         {
-            if (!this.Accepts(request.EntityMetaData.EntityType))
+            if (!Accepts(request.EntityMetaData.EntityType))
                 yield break;
-
 
             // Query Input
             var entityType = request.EntityMetaData.EntityType;
@@ -72,14 +52,10 @@ namespace CluedIn.ExternalSearch.Providers.Dawa
 
             if (address != null)
             {
-                var values = address.GetOrganizationNameVariants()
-                                             .Select(NameNormalization.Normalize)
-                                             .ToHashSet();
+                var values = address.GetOrganizationNameVariants().Select(NameNormalization.Normalize).ToHashSet();
 
                 foreach (var value in values)
                 {
-
-
                     yield return new ExternalSearchQuery(this, entityType, ExternalSearchQueryParameter.Name, value);
                 }
             }
@@ -93,13 +69,18 @@ namespace CluedIn.ExternalSearch.Providers.Dawa
             var client = new RestClient("https://dawa.aws.dk/datavask/");
             var request = new RestRequest("adresser", Method.GET);
             request.AddParameter("betegnelse", address);
-            var response = client.Execute<AddressResponse>(request);
+            var response = client.Execute(request);
+            var data = JsonConvert.DeserializeObject<AddressResponse>(response.Content);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                if (response.Data != null)
+                var allowedCategories = new string[] { "A", "B" };
+                if (data != null && allowedCategories.Contains(data.Category))
                 {
-                    yield return new ExternalSearchQueryResult<List<Resultater>>(query, response.Data.Resultater);
+                    foreach (var result in data.Results)
+                    {
+                        yield return new ExternalSearchQueryResult<Result>(query, result);
+                    }
                 }
             }
             else if (response.StatusCode == HttpStatusCode.NoContent || response.StatusCode == HttpStatusCode.NotFound)
@@ -114,32 +95,38 @@ namespace CluedIn.ExternalSearch.Providers.Dawa
         /// <inheritdoc/>
         public override IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request)
         {
-            var resultItem = result.As<Resultater>();
+            var resultItem = result.As<Result>();
 
+            string id;
+            if (request.QueryParameters.ContainsKey(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesCVR))
+            {
+                id = request.QueryParameters.GetValue(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesCVR).FirstOrDefault();
+            }
+            else
+            {
+                id = resultItem.Data.ActualAddress.AccessAddressId;
+            }
 
-
-            var code = new EntityCode(EntityType.Person, CodeOrigin.CluedIn.CreateSpecific("dawa"), resultItem.Data.Adresse.Adgangsadresseid);
+            var code = new EntityCode(EntityType.Organization, CodeOrigin.CluedIn, id);
 
             var clue = new Clue(code, context.Organization);
 
-            clue.Data.OriginProviderDefinitionId = this.Id;
+            clue.Data.OriginProviderDefinitionId = Id;
 
-            this.PopulateMetadata(clue.Data.EntityData, resultItem);
+            PopulateMetadata(clue.Data.EntityData, resultItem, request);
 
             yield return clue;
-
-
         }
 
         /// <inheritdoc/>
         public override IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request)
         {
-            var resultItem = result.As<Resultater>();
+            var resultItem = result.As<Result>();
 
             if (resultItem == null)
                 return null;
 
-            return this.CreateMetadata(resultItem);
+            return CreateMetadata(resultItem, request);
         }
 
         /// <inheritdoc/>
@@ -151,14 +138,14 @@ namespace CluedIn.ExternalSearch.Providers.Dawa
         /// <summary>Creates the metadata.</summary>
         /// <param name="resultItem">The result item.</param>
         /// <returns>The metadata.</returns>
-        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<Resultater> resultItem)
+        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<Result> resultItem, IExternalSearchRequest request)
         {
             if (resultItem == null)
                 throw new ArgumentNullException(nameof(resultItem));
 
             var metadata = new EntityMetadataPart();
 
-            this.PopulateMetadata(metadata, resultItem);
+            PopulateMetadata(metadata, resultItem, request);
 
             return metadata;
         }
@@ -166,56 +153,54 @@ namespace CluedIn.ExternalSearch.Providers.Dawa
         /// <summary>Gets the origin entity code.</summary>
         /// <param name="resultItem">The result item.</param>
         /// <returns>The origin entity code.</returns>
-        private EntityCode GetOriginEntityCode(IExternalSearchQueryResult<Resultater> resultItem)
+        private EntityCode GetOriginEntityCode(IExternalSearchQueryResult<Result> resultItem)
         {
             if (resultItem == null)
                 throw new ArgumentNullException(nameof(resultItem));
 
-            return new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultItem.Data.Adresse.Adgangsadresseid);
+            return new EntityCode(EntityType.Organization, GetCodeOrigin(), resultItem.Data.Address.AccessAddressId);
         }
 
         /// <summary>Gets the code origin.</summary>
         /// <returns>The code origin</returns>
         private CodeOrigin GetCodeOrigin()
         {
-            return CodeOrigin.CluedIn.CreateSpecific("dawa");
+            return CodeOrigin.CluedIn;
         }
 
         /// <summary>Populates the metadata.</summary>
         /// <param name="metadata">The metadata.</param>
         /// <param name="resultItem">The result item.</param>
-        private void PopulateMetadata(IEntityMetadata metadata, IExternalSearchQueryResult<Resultater> resultItem)
+        private void PopulateMetadata(IEntityMetadata metadata, IExternalSearchQueryResult<Result> resultItem, IExternalSearchRequest request)
         {
             if (resultItem == null)
                 throw new ArgumentNullException(nameof(resultItem));
 
-            var code = this.GetOriginEntityCode(resultItem);
+            var code = GetOriginEntityCode(resultItem);
             var data = resultItem.Data;
 
+            metadata.Name = request.QueryParameters.GetValue(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName, new HashSet<string>()).FirstOrDefault();
             metadata.EntityType = EntityType.Organization;
             metadata.CreatedDate = resultItem.CreatedDate;
 
             metadata.OriginEntityCode = code;
             metadata.Codes.Add(code);
 
-            metadata.Properties[DamaVocabularies.Organization.Adresseringsvejnavn] = data.Aktueladresse.Adresseringsvejnavn.PrintIfAvailable();
-            metadata.Properties[DamaVocabularies.Organization.Dør] = data.Aktueladresse.Dør.PrintIfAvailable();
-            metadata.Properties[DamaVocabularies.Organization.Etage] = data.Aktueladresse.Etage.PrintIfAvailable();
-            metadata.Properties[DamaVocabularies.Organization.Husnr] = data.Aktueladresse.Husnr.PrintIfAvailable();
-            metadata.Properties[DamaVocabularies.Organization.Id] = data.Aktueladresse.Id.PrintIfAvailable();
-            metadata.Properties[DamaVocabularies.Organization.Postnr] = data.Aktueladresse.Postnr.PrintIfAvailable();
-            metadata.Properties[DamaVocabularies.Organization.Postnrnavn] = data.Aktueladresse.Postnrnavn.PrintIfAvailable();
-            metadata.Properties[DamaVocabularies.Organization.Status] = data.Aktueladresse.Status.PrintIfAvailable();
-            metadata.Properties[DamaVocabularies.Organization.Supplerendebynavn] = data.Aktueladresse.Supplerendebynavn.PrintIfAvailable();
-            metadata.Properties[DamaVocabularies.Organization.Vejnavn] = data.Aktueladresse.Vejnavn.PrintIfAvailable();
-            metadata.Properties[DamaVocabularies.Organization.Virkningslut] = data.Aktueladresse.Virkningslut.PrintIfAvailable();
-            metadata.Properties[DamaVocabularies.Organization.Virkningstart] = data.Aktueladresse.Virkningstart.PrintIfAvailable();
+            metadata.Properties[DamaVocabularies.Organization.AdressingStreetName] = data.ActualAddress.AdressingStreetName.PrintIfAvailable();
+            metadata.Properties[DamaVocabularies.Organization.Door] = data.ActualAddress.Door.PrintIfAvailable();
+            metadata.Properties[DamaVocabularies.Organization.Floor] = data.ActualAddress.Floor.PrintIfAvailable();
+            metadata.Properties[DamaVocabularies.Organization.HouseNumber] = data.ActualAddress.HouseNumber.PrintIfAvailable();
+            metadata.Properties[DamaVocabularies.Organization.Id] = data.ActualAddress.Id.PrintIfAvailable();
+            metadata.Properties[DamaVocabularies.Organization.Zipcode] = data.ActualAddress.Zipcode.PrintIfAvailable();
+            metadata.Properties[DamaVocabularies.Organization.ZipcodeName] = data.ActualAddress.Zipcodename.PrintIfAvailable();
+            metadata.Properties[DamaVocabularies.Organization.Status] = data.ActualAddress.Status.PrintIfAvailable();
+            metadata.Properties[DamaVocabularies.Organization.AdditionalCityName] = data.ActualAddress.AdditionalCityName.PrintIfAvailable();
+            metadata.Properties[DamaVocabularies.Organization.StreetName] = data.ActualAddress.StreetName.PrintIfAvailable();
+            metadata.Properties[DamaVocabularies.Organization.EffectiveEnd] = data.ActualAddress.EffectiveEnd.PrintIfAvailable();
+            metadata.Properties[DamaVocabularies.Organization.EffectiveStart] = data.ActualAddress.EffectiveStart.PrintIfAvailable();
 
-            metadata.Uri = new Uri(data.Aktueladresse.Href);
-
+            metadata.Uri = new Uri(data.ActualAddress.Href);
         }
-
-
 
         public string Icon { get; } = "Resources.dawa.jpg";
         public string Domain { get; } = "https://dawa.aws.dk/";

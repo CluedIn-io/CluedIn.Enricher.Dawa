@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Text;
 
 namespace CluedIn.ExternalSearch.Providers.Dawa.Models
 {
-    public class Address
+    public class ActualAddress
     {
+
         [JsonProperty("id")]
         public string Id { get; set; }
 

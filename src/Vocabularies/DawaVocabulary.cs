@@ -8,12 +8,12 @@ namespace CluedIn.ExternalSearch.Providers.Dawa.Vocabularies
     {
         protected DawaVocabulary()
         {
-            this.VocabularyName = "Dawa";
-            this.KeyPrefix      = "dawa";
-            this.KeySeparator   = ".";
-            this.Grouping       = CluedIn.Core.Data.EntityType.Location.Address;
+            VocabularyName = "Dawa";
+            KeyPrefix      = "dawa";
+            KeySeparator   = ".";
+            Grouping       = Core.Data.EntityType.Location.Address;
 
-            this.Dawa = this.Add(new VocabularyKey("dawa", VocabularyKeyVisibility.Hidden));
+            Dawa = Add(new VocabularyKey("dawa", VocabularyKeyVisibility.Hidden));
         }
         
         public VocabularyKey Dawa { get; set; }
