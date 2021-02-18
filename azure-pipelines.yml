@@ -1,59 +1,51 @@
 name: $(Date:yyyyMMdd)$(Rev:.r)
 
-trigger:
-  branches:
-    include:
-    - master
-    - develop
-  tags:
-    include:
-      - v*
-  paths:
-    exclude:
-    - '*.md'
+parameters:
+  - name: configuration
+    displayName: The build configuration for dotnet
+    type: string
+    default: Release
 
-pr:
-  branches:
-    include:
-    - develop
-    - master
-    - release/*
-  paths:
-    exclude:
-    - '*.md'
+# Trigger builds for the following branches only
+trigger:
+  - master
+  - release/*
+  - support/*
 
 resources:
   repositories:
-    - repository: templates
+    - repository: cluedin
       type: github
-      name: CluedIn-io/AzurePipelines.Templates
-      endpoint: 'CluedIn-io'
-
-pool:
-  vmImage: 'windows-latest'
+      name: CluedIn-Io/Azure
+      endpoint: Github
 
 variables:
-  - group: nuget  
-  - name: testFolderPath
-    value: '$(Build.SourcesDirectory)/test'
-  - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
-    value: true
-  - name: DOTNET_CLI_TELEMETRY_OPTOUT
-    value: true
+  - name: version
+    value: 1.0.$(Build.BuildNumber) # Logic for calculating build number can vary - set as required
 
-steps:
+jobs:
+  - template: pipelines/CluedIn.Crawler.yml@cluedin
+    parameters:
+      configuration: ${{ parameters.configuration }}
+      version: $(version)
+      testsEnabled: false
 
-  # Configure NuGet
-- pwsh: |
-    @('develop','release','AzurePipelines') | ForEach-Object{
-        dotnet nuget update  source $_ -p $env:NUGET_KEY -u VssSessionToken --configfile nuget.config
-    }
-  condition: and(succeeded(), variables['nuget.key'])
-  displayName: 'Add api token to access nuget artifacts'
-  env:
-    NUGET_KEY: $(nuget.key)
-
-- template: crawler.netcore.build.yml@templates
-
-- template: documentation.publish.yml@templates
-
+  # The following receives pushes nuget packages to an internal
+  # artifacts feed, change as required
+  - job: nuget_push
+    displayName: Push Nuget Packages
+    dependsOn: job_cluedin_build
+    condition: succeeded()
+    steps:
+      - checkout: none
+      - download: current
+        displayName: Download nuget artifacts
+        artifact: nuget
+        
+      - task: DotNetCoreCLI@2
+        displayName: Push nuget packages
+        inputs:
+          command: 'push'
+          packagesToPush: '$(Pipeline.Workspace)/nuget/*.nupkg;!$(Pipeline.Workspace)/nuget/*.symbols.nupkg'
+          nuGetFeedType: 'internal'
+          publishVstsFeed: 'MDM/MDM_feed'
