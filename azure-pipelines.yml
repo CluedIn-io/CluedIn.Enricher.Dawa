@@ -8,7 +8,7 @@ parameters:
 
 # Trigger builds for the following branches only
 trigger:
-  - master
+  - main
   - release/*
   - support/*
 
