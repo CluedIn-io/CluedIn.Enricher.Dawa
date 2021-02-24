@@ -1,0 +1,84 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\badwords.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Companies.DA.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Companies.HVAC.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Companies.Lawyers.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Companies.Restaurants.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Companies.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Company.Names.Crunchbase.ODM.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Company.Names.DA.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Company.Names.Gleif.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Company.Names.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Company.PostFix.DK.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Company.PostFix.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Core14.profile.xml" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Countries.DA.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Countries.DE.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Countries.EN.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Countries.ES.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Countries.FR.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Countries.SE.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Countries.Translations.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\emails-ignored-codes.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\emails-newsletter-providers.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\emails-noreply-domains.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\emails-noreply-emailaddresses.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\emails-providers.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\FirstName.Nicknames.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\FirstNames.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\FullNames.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\JobTitles.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\LastNames.NonEN.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\LastNames.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\MicrosoftTimeZoneIndexValues.csv" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Products.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\RailsTimeZoneIdentifiers.csv" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\States.Abbreviation.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\States.AbbreviationMapping.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\States.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Stopwords.DA.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Stopwords.EN.Topics.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Stopwords.EN.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\Stopwords.Training.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\TimeZoneTable.csv" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\UnwantedCompanyNames.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\UnwantedFirstNames.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\UnwantedGeneratedNames.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\UnwantedInlinePersonTags.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\UnwantedInlineTags.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\UnwantedLastNamePostfix.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\UnwantedLocations.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\UnwantedNamePostfix.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\UnwantedWords.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\UnwantedWords2.txt" />
+    <Content Remove="C:\Users\traff\.nuget\packages\cluedin.testing.base\3.0.0-netcore.16\contentFiles\any\netcoreapp3.1\windowsZones.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\traff\source\repos\Enricher.DAWA\build\assets\nugetlogo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CluedIn.Testing.Base" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Moq" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\ExternalSearch.Providers.Dawa.csproj" />
+  </ItemGroup>
+
+</Project>

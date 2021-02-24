@@ -18,7 +18,6 @@ using CluedIn.Core.Providers;
 using CluedIn.Crawling.Helpers;
 using CluedIn.ExternalSearch.Providers.Dawa.Vocabularies;
 using EntityType = CluedIn.Core.Data.EntityType;
-using CluedIn.Core.Messages.WebApp;
 
 namespace CluedIn.ExternalSearch.Providers.Dawa
 {
@@ -39,6 +38,11 @@ namespace CluedIn.ExternalSearch.Providers.Dawa
         /**********************************************************************************************************
          * METHODS
          **********************************************************************************************************/
+
+        public override bool Accepts(EntityType entityType)
+        {
+            return entityType == EntityType.Location;
+        }
 
         /// <inheritdoc/>
         public override IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request)
